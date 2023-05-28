@@ -1,5 +1,4 @@
 const XLSX = require('xlsx');
-const fs = require('fs');
 const { getTokens, toJavaScript } = require('excel-formula');
 
 function build(path, config) {
@@ -7,7 +6,7 @@ function build(path, config) {
 
     // Load the Excel file
 
-    const workbook = XLSX.readFile(excelFilePath);
+    const workbook = XLSX.readFile(path);
 
     // Get the first sheet of the workbook (assuming only one sheet)
 
@@ -16,21 +15,25 @@ function build(path, config) {
 
     // Build the model working backwards from the output cells
 
-    const model = {};
+    const model = {
+        outputs: outputs,
+        inputs: inputs,
+        schema: {}
+    };
 
     Object.keys(outputs).forEach(buildModel);
 
-    function buildModel(cellAddress, model) {
+    function buildModel(cellAddress) {
         cellAddress = sanitizeCell(cellAddress);
 
         // Comprovar si ja l'hem processat
 
-        if (model[cellAddress]) return;
+        if (model.schema[cellAddress]) return;
 
         // Comprovar si és una cel·la d'entrada
 
         if (inputs[cellAddress]) {
-            model[cellAddress] = {
+            model.schema[cellAddress] = {
                 input: inputs[cellAddress],
             };
 
@@ -48,7 +51,7 @@ function build(path, config) {
 
             // És un valor numèric
 
-            model[cellAddress] = cell.v
+            model.schema[cellAddress] = cell.v
             return;
         }
 
@@ -58,7 +61,7 @@ function build(path, config) {
         const tokens = getTokens(sanitizedFormula);
         const jsFormula = toJavaScript(sanitizedFormula);
 
-        model[cellAddress] = {
+        model.schema[cellAddress] = {
             formula: sanitizedFormula,
             expression: jsFormula,
         }

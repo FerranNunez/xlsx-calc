@@ -1,5 +1,5 @@
-function run(model, config) {
-    const { outputs } = config;
+function run(model, inputs) {
+    const { outputs, schema } = model;
 
     const expressions = {}
 
@@ -7,22 +7,16 @@ function run(model, config) {
         expressions[outputCell] = buildExpression(outputCell);
     });
 
-    const evaluatedExpressions = {}
-
-    Object.keys(expressions).forEach((expression) => {
-        evaluatedExpressions[expression] = evaluateExpression(expressions[expression]);
-    })
-
     const results = {}
 
     Object.keys((outputs)).forEach((outputCell) => {
-        results[outputs[outputCell]] = evaluatedExpressions[expressions[outputCell]];
+        results[outputs[outputCell]] = expressions[outputCell];
     });
 
     function buildExpression(cell) {
         if (expressions[cell]) return expressions[cell];
 
-        const modelData = model[cell];
+        const modelData = schema[cell];
 
         // If it's a number, return it
 
@@ -40,9 +34,9 @@ function run(model, config) {
         // If it's an input, return its value
 
         if (modelData.input) {
-            const formattedInput = typeof inputValues[modelData.input] === 'string' ?
-                `"${inputValues[modelData.input]}"` :
-                inputValues[modelData.input];
+            const formattedInput = typeof inputs[modelData.input] === 'string' ?
+                `"${inputs[modelData.input]}"` :
+                inputs[modelData.input];
 
             expressions[cell] = formattedInput;
 
