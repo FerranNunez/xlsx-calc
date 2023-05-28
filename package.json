@@ -1,0 +1,16 @@
+{
+  "name": "@ferrannunez/xlsx-calc",
+  "version": "1.0.0",
+  "description": "Builds, serializes and runs xlsx to js models.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "excel-formula": "^1.5.0",
+    "xlsx": "^0.18.5"
+  }
+}
